@@ -2,6 +2,9 @@ package it.alessiomontanari.classes;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Soccorritore {
 
     private int matricola;
@@ -14,6 +17,9 @@ public class Soccorritore {
         this.codiceSoccorso = code;
         this.username = username;
         this.position = latLng;
+    }
+
+    public Soccorritore() {
     }
 
 
@@ -55,5 +61,18 @@ public class Soccorritore {
 
     public String getStrMatricola() {
         return String.valueOf(matricola);
+    }
+
+    public Soccorritore objIntoNew(Map<String, Object> data, Soccorritore s) {
+        s.setMatricola(((Long) data.get("matricola")).intValue());
+        s.setCodiceSoccorso((String) data.get("codiceSoccorso"));
+        s.setUsername((String) data.get("username"));
+
+        HashMap<String, Double> positionData = (HashMap<String, Double>) data.get("position");
+        double latitude = positionData.get("latitude");
+        double longitude = positionData.get("longitude");
+        s.setPosition(new LatLng(latitude, longitude));
+
+        return s;
     }
 }
