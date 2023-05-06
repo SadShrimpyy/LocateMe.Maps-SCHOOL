@@ -1,0 +1,22 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+
+        jcenter()
+        maven {
+            name 'hypertrack'
+            url 'https://s3-us-west-2.amazonaws.com/m2.hypertrack.com/'
+        }
+    }
+}
+rootProject.name = "GoogleMaps Cerca Persone"
+include ':app'
