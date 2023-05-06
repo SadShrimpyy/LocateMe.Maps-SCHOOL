@@ -106,6 +106,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         firestore.storeNewSocc(new Soccorritore(1014, "fourthSoccorrer", "codeApp01", new LatLng(3, 3)));
 
         firestore.updatePosLastSocc(new LatLng(1.531241, 1.2142121));
+
+        firestore.readOthers();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
