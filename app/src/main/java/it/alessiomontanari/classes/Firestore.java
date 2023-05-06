@@ -1,18 +1,14 @@
 package it.alessiomontanari.classes;
 
 import android.os.Build;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.*;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 import it.alessiomontanari.MapsActivity;
 
@@ -23,6 +19,8 @@ public class Firestore {
     private Toast toast;
     private DocumentReference documentRef;
     private Soccorritore soccorritore;
+    private String TAG = "DB";
+
 
     public Firestore(MapsActivity context, Toast toast) {
         this.context = context;
@@ -39,9 +37,9 @@ public class Firestore {
 
         documentRef.set(soccorritore)
                 .addOnSuccessListener(aVoid -> {
-                    System.out.println("[DB] Inserimento effettuato con successo, il documento ha ID: " + documentRef.getId());
+                    Log.d("DB", "Inserimento effettuato con successo, il documento ha ID: " + documentRef.getId());
                 }).addOnFailureListener(e -> {
-                    System.out.println("[DB] inserimento NON effettiato");
+                    Log.d("DB", "inserimento NON effettiato");
                 });
     }
 
@@ -51,37 +49,36 @@ public class Firestore {
 
         documentRef.set(soccorritore)
                 .addOnSuccessListener(aVoid -> {
-                    System.out.println("[DB] Aggiornamento effettuato con successo");
+                    Log.d("DB", "Aggiornamento effettuato con successo");
                 }).addOnFailureListener(e -> {
-                    System.out.println("[DB] Aggiornamento NON effettiato");
+                    Log.d("DB", "Inserimento NON effettiato");
                 });
 
     }
 
     public void readOthers() {
         if (documentRef == null) return;
-        HashMap<String, Object> objs;
+        HashMap<String, Soccorritore> objs = new HashMap<>();
 
-        documentRef.get()
-                .addOnSuccessListener(snapshot -> {
-                    documents = snapshot.getId();
-                    if (data != null)
-                        //System.out.println("[DB] alls: " + data.get(Integer.toString(soccorritore.getMatricola())));
-                        System.out.println("[DB] alls: " + data);
+        CollectionReference collectionRef = db.collection(soccorritore.getCodiceSoccorso());
+        collectionRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                extract(objs, task);
+            } else if (task.getException() != null) {
+                Log.d("DB", "Errore nel recuperare i documenti: ", task.getException());
+            } else {
+                Log.d("DB", "Errore nel recuperare i documenti.");
+            }
+        }).addOnFailureListener(e -> Log.d("[DB]", "Errore nel recuperare i documenti: " + e.getMessage()));
+    }
 
-                    assert data != null;
-                    List<String> list = new LinkedList<>(data.keySet());
-                    if (list.isEmpty()) return;
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        list.forEach(str -> {
-                            System.out.println("[DB] values in " + str + " :" + data.get(str));
-                        });
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    System.out.println("[DB] La query non è stata eseguita correttamente: " + e.getCause());
-                });
+    private void extract(HashMap<String, Soccorritore> objs, Task<QuerySnapshot> task) {
+        Soccorritore s = new Soccorritore();
+        for (QueryDocumentSnapshot document : task.getResult()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                objs.putIfAbsent(s.getStrMatricola(), s.objIntoNew(document.getData(), s));
+            Log.d("DB", "Aggiornato il soccorritore: " + document.getId() + " => " + document.getData());
+        }
     }
 
     public void delete() {
