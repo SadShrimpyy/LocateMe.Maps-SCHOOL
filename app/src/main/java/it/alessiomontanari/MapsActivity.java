@@ -63,7 +63,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LocationManager locationManager;
     private LocationListener locationListener;
     private MarkerOptions currentPosOptions;
-    private OtherLocations otherLocations;
+    private final OtherLocations otherLocations = new OtherLocations();
 
     private LatLng tempLatLng = null;
 
@@ -74,7 +74,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(ActivityMapsBinding.inflate(getLayoutInflater()).getRoot());
 
         soccorritore = new Soccorritore(matricola, username, codiceSoccorso, null);
-        //HyperTrack hypertrackSdk = HyperTrack.getInstance("TTBuOUwlOBrbM5n_27lvaxTU4L57IErgbU3zjgx4tSg1cAgEX69o8UBQ2IMb8HJI7cH7nk8mNhqOxe9kkUA_oQ");
 
         // Toast e ascoltatore di eventi
         toast = Toast.makeText(this, "", Toast.LENGTH_SHORT);
@@ -107,7 +106,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         firestore.updatePosLastSocc(new LatLng(1.531241, 1.2142121));
 
-        firestore.readOthers();
+        otherLocations.update(firestore.readOthers());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
