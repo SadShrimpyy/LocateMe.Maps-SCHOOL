@@ -56,29 +56,30 @@ public class Firestore {
 
     }
 
-    public void readOthers() {
-        if (documentRef == null) return;
-        HashMap<String, Soccorritore> objs = new HashMap<>();
+    public HashMap<String, Soccorritore> readOthers() {
+        if (documentRef == null) return null;
+        HashMap<String, Soccorritore> others = new HashMap<>();
 
         CollectionReference collectionRef = db.collection(soccorritore.getCodiceSoccorso());
         collectionRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                extract(objs, task);
-            } else if (task.getException() != null) {
+                others.putAll(extract(others, task));// passa objs e task alla funzione extract
+            } else if (task.getException() != null)
                 Log.d("DB", "Errore nel recuperare i documenti: ", task.getException());
-            } else {
+            else
                 Log.d("DB", "Errore nel recuperare i documenti.");
-            }
         }).addOnFailureListener(e -> Log.d("[DB]", "Errore nel recuperare i documenti: " + e.getMessage()));
+        return others;
     }
 
-    private void extract(HashMap<String, Soccorritore> objs, Task<QuerySnapshot> task) {
+    private HashMap<String, Soccorritore> extract(HashMap<String, Soccorritore> objs, Task<QuerySnapshot> task) {
         Soccorritore s = new Soccorritore();
         for (QueryDocumentSnapshot document : task.getResult()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                 objs.putIfAbsent(s.getStrMatricola(), s.objIntoNew(document.getData(), s));
             Log.d("DB", "Aggiornato il soccorritore: " + document.getId() + " => " + document.getData());
         }
+        return objs;
     }
 
     public void delete() {
