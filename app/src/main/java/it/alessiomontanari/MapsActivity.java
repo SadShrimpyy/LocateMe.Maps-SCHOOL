@@ -14,7 +14,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.sax.ElementListener;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -28,11 +27,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+
 import it.alessiomontanari.classes.ButtonsManager;
 import it.alessiomontanari.classes.ExtendedMarker;
 import it.alessiomontanari.classes.Firestore;
 import it.alessiomontanari.classes.Listeners;
-import it.alessiomontanari.classes.OtherLocations;
 import it.alessiomontanari.classes.Soccorritore;
 import it.alessiomontanari.databinding.ActivityMapsBinding;
 
@@ -55,7 +54,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // Markers
     public static ArrayList<ExtendedMarker> markerList = new ArrayList<>();
-    private GoogleMap mMap;
+    public GoogleMap mMap;
     private Listeners clicksListener;
 
     // Posizione
@@ -63,7 +62,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LocationManager locationManager;
     private LocationListener locationListener;
     private MarkerOptions currentPosOptions;
-    private final OtherLocations otherLocations = new OtherLocations();
 
     private LatLng tempLatLng = null;
 
@@ -99,14 +97,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        firestore.storeNewSocc(new Soccorritore(1011, "firstSoccorrer", "codeApp01", new LatLng(0, 0)));
-        firestore.storeNewSocc(new Soccorritore(1012, "secondSoccorrer", "codeApp01", new LatLng(1, 1)));
-        firestore.storeNewSocc(new Soccorritore(1013, "thirdSoccorrer", "codeApp02", new LatLng(2, 2)));
+        firestore.storeNewSocc(new Soccorritore(1011, "firstSoccorrer", "codeApp01", new LatLng(45.806302, 9.004601)));
+        firestore.storeNewSocc(new Soccorritore(1012, "secondSoccorrer", "codeApp01", new LatLng(45.489426, 9.185625)));
+        firestore.storeNewSocc(new Soccorritore(1013, "thirdSoccorrer", "codeApp02", new LatLng(50.013032, 19.719968)));
         firestore.storeNewSocc(new Soccorritore(1014, "fourthSoccorrer", "codeApp01", new LatLng(3, 3)));
 
-        firestore.updatePosLastSocc(new LatLng(1.531241, 1.2142121));
-
-        otherLocations.update(firestore.readOthers());
+        firestore.updatePosLastSocc(new LatLng(50.586165, 28.290485));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -119,6 +115,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             tempLatLng = latLng;
             addMarker();
         });
+
+        if (mMap != null)
+            firestore.updatePos();
 
         // Aggiungere i listener
         addListeners();
@@ -205,22 +204,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                mMap.clear();
-                // Cambio icona del marcatore
-                LatLng newLatLang = new LatLng(location.getLatitude(), location.getLongitude());
-                currentPosOptions = new MarkerOptions()
-                        .position(newLatLang)
-                        .title("Posizione attuale")
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.user_blue_marker));
-                mMap.addMarker(currentPosOptions); // Aggiungo il marcatore
+                if (counter > 3) {
+                    mMap.clear();
+                    firestore.updatePos();
+                    // Cambio icona del marcatore
+                    LatLng newLatLang = new LatLng(location.getLatitude(), location.getLongitude());
+                    currentPosOptions = new MarkerOptions()
+                            .position(newLatLang)
+                            .title("Posizione attuale")
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.user_blue_marker));
+                    mMap.addMarker(currentPosOptions); // Aggiungo il marcatore
 
-                //mMap.moveCamera(CameraUpdateFactory.newLatLng(newLatLang)); // Muovo la camera
-                // Aggiungo i marcatori (ho cancellato la mappa)
-                for (ExtendedMarker marker : markerList)
-                    mMap.addMarker(marker.getMarker());
-                soccorritore.setPosition(newLatLang);
-                if (counter > 9) {
-                    //firestore.updatePos(soccorritore);
+                    // Aggiungo i marcatori (ho cancellato la mappa)
+                    for (ExtendedMarker marker : markerList)
+                        mMap.addMarker(marker.getMarker());
+                    soccorritore.setPosition(newLatLang);
                     counter = 0;
                 }
                 else
@@ -234,7 +232,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onProviderEnabled(String provider) { }
 
             @Override
-            public void onProviderDisabled(String provider) { }
+            public void onProviderDisabled(String provider) {
+
+            }
         };
 
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
