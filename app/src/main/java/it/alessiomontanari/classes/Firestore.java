@@ -36,24 +36,14 @@ public class Firestore {
         marker = new MarkerOptions();
     }
 
-    /*
-        # Aggiorna la posizione, in memoria, dell'ultimo soccorritore
-     */
     public void updatePosLastSocc(LatLng latLng) {
         soccorritore.setPosition(latLng);
 
         documentRef.set(soccorritore)
-                .addOnSuccessListener(aVoid -> {
-                    Log.d(TAG, "Aggiornamento effettuato con successo");
-                }).addOnFailureListener(e -> {
-                    Log.d(TAG, "Inserimento NON effettiato");
-                });
-
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "Aggiornamento effettuato con successo"))
+                .addOnFailureListener(e -> Log.d(TAG, "Inserimento NON effettuato"));
     }
 
-    /*
-        # Ritorna tutti i soccorritori - M.2
-     */
     public HashMap<String, Soccorritore> updateAll() {
         if (documentRef == null) return null;
         HashMap<String, Soccorritore> others = new HashMap<>();
@@ -61,18 +51,15 @@ public class Firestore {
         CollectionReference collectionRef = db.collection(soccorritore.getCodiceSoccorso());
         collectionRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                others.putAll(extract(others, task)); // passa objs e task alla funzione extract
-            } else if (task.getException() != null)
+                others.putAll(extract(others, task));
+            } else {
                 Log.d(TAG, "Errore nel recuperare i documenti: ", task.getException());
-            else
-                Log.d(TAG, "Errore nel recuperare i documenti.");
+            }
         }).addOnFailureListener(e -> Log.d(TAG, "Errore nel recuperare i documenti: " + e.getMessage()));
+
         return others;
     }
 
-    /*
-        # Aggiorna la posizione dei marcatori degli operatori
-     */
     public void updatePos() {
         if (documentRef == null) return;
 
@@ -82,15 +69,14 @@ public class Firestore {
                     if (task.isSuccessful()) {
                         Soccorritore tempSocc = new Soccorritore();
                         for (QueryDocumentSnapshot document : task.getResult()) {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                tempSocc = tempSocc.objIntoNew(document.getData(), tempSocc);
-                                System.out.printf(" --> FETCHED => Socc %s(%s) with location lat: %f and lon: %f\n", tempSocc.getUsername(), tempSocc.getStrMatricola(), tempSocc.getLat(), tempSocc.getLon());
-                                marker
-                                        .position(tempSocc.getPosition())
-                                        .title("Operatore " + tempSocc.getUsername())
-                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.user_yellow_marker));
-                                context.getmMap().addMarker(marker);
-                            }
+                            tempSocc = tempSocc.objIntoNew(document.getData(), tempSocc);
+                            Log.d(TAG, String.format(" --> FETCHED => Socc %s(%s) with location lat: %f and lon: %f\n",
+                                    tempSocc.getUsername(), tempSocc.getStrMatricola(), tempSocc.getLat(), tempSocc.getLon()));
+
+                            marker.position(tempSocc.getPosition())
+                                    .title("Operatore " + tempSocc.getUsername())
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.user_yellow_marker));
+                            context.getmMap().addMarker(marker);
                         }
                     } else {
                         Log.d(TAG, "Errore nel recuperare i documenti: ", task.getException());
@@ -99,50 +85,36 @@ public class Firestore {
                 .addOnFailureListener(e -> Log.d(TAG, "Errore nel recuperare i documenti: " + e.getMessage()));
     }
 
-    /*
-        # Estraggo i soccorritori dalla task
-     */
     private HashMap<String, Soccorritore> extract(HashMap<String, Soccorritore> objs, Task<QuerySnapshot> task) {
-        Soccorritore s = new Soccorritore();
+        Soccorritore socc = new Soccorritore();
         for (QueryDocumentSnapshot document : task.getResult()) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                objs.putIfAbsent(s.getStrMatricola(), s.objIntoNew(document.getData(), s));
+            objs.put(socc.getStrMatricola(), socc.objIntoNew(document.getData(), socc));
             Log.d(TAG, "Aggiornato il soccorritore: " + document.getId() + " => " + document.getData());
         }
         return objs;
     }
 
-    /*
-        # Elimina il documento
-     */
     public void delete() {
         if (documentRef == null) return;
 
-        documentRef.delete().addOnSuccessListener(aVoid -> {
-            // l'eliminazione è stata completata con successo
-        }).addOnFailureListener(e -> {
-            // gestire eventuali errori
-        });
+        documentRef.delete()
+                .addOnSuccessListener(aVoid -> {
+                    // l'eliminazione è stata completata con successo
+                })
+                .addOnFailureListener(e -> {
+                    // gestire eventuali errori
+                });
     }
 
-    /*
-        # Aggiungi un nuovo soccorritore nel database di firebase
-     */
     public void storeNewSocc(Soccorritore soccorritore) {
         this.soccorritore = soccorritore;
 
         this.documentRef = db.collection(this.soccorritore.getCodiceSoccorso()).document(this.soccorritore.getStrMatricola());
 
-
         if (this.soccorritore == null) return;
 
-        assert this.soccorritore != null;
-
         documentRef.set(soccorritore)
-                .addOnSuccessListener(aVoid -> {
-                    Log.d(TAG, "Inserimento effettuato con successo, il documento ha ID: " + documentRef.getId());
-                }).addOnFailureListener(e -> {
-                    Log.d(TAG, "inserimento NON effettiato");
-                });
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "Inserimento effettuato con successo, il documento ha ID: " + documentRef.getId()))
+                .addOnFailureListener(e -> Log.d(TAG, "Inserimento NON effettuato"));
     }
 }
