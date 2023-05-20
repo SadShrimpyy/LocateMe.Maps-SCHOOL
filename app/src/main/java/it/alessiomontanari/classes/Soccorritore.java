@@ -4,6 +4,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class Soccorritore {
 
@@ -47,12 +48,19 @@ public class Soccorritore {
     }
 
     public double getLat() {
-        return position.latitude;
+        if (position != null)
+            return position.latitude;
+        else
+            return 0.0;
     }
 
     public double getLon() {
-        return position.longitude;
+        if (position != null)
+            return position.longitude;
+        else
+            return 0.0;
     }
+
 
     public void setPosition(LatLng position) {
         this.position = position;
@@ -71,14 +79,19 @@ public class Soccorritore {
         return String.valueOf(matricola);
     }
 
+    /** Passata una HashMap di oggetti generici e un soccorritore, ritorno l'oggetto soccorritore con i propri valori */
     public Soccorritore objIntoNew(Map<String, Object> data, Soccorritore s) {
-        s.setMatricola(((Long) data.get("matricola")).intValue());
+        s.setMatricola(((Long) Objects.requireNonNull(data.get("matricola"))).intValue());
         s.setCodiceSoccorso((String) data.get("codiceSoccorso"));
         s.setUsername((String) data.get("username"));
 
         HashMap<String, Double> positionData = (HashMap<String, Double>) data.get("position");
-        double latitude = positionData.get("latitude");
-        double longitude = positionData.get("longitude");
+        double latitude = 0.0;
+        double longitude = 0.0;
+        if (positionData != null) {
+            latitude = Objects.requireNonNull(positionData.get("latitude")).doubleValue();
+            longitude = Objects.requireNonNull(positionData.get("longitude")).doubleValue();
+        }
         s.setPosition(new LatLng(latitude, longitude));
 
         return s;

@@ -1,10 +1,7 @@
 package it.alessiomontanari.classes;
 
-import android.os.Build;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -20,22 +17,21 @@ public class Firestore {
 
     private FirebaseFirestore db;
     private MapsActivity context;
-    private Toast toast;
     private DocumentReference documentRef;
     private Soccorritore soccorritore;
     private String TAG = "<DB>";
     private MarkerOptions marker;
 
 
-    public Firestore(MapsActivity context, Toast toast) {
+    public Firestore(MapsActivity context) {
         this.context = context;
-        this.toast = toast;
 
         this.db = FirebaseFirestore.getInstance();
 
         marker = new MarkerOptions();
     }
 
+    /** Aggiorna la posizione dell'ultimo soccorritore utilizzato dalla classe */
     public void updatePosLastSocc(LatLng latLng) {
         soccorritore.setPosition(latLng);
 
@@ -60,6 +56,7 @@ public class Firestore {
         return others;
     }
 
+    /** Aggiorna la posizione del soccorritore, ricollocando il suo marcatore */
     public void updatePos() {
         if (documentRef == null) return;
 
@@ -68,21 +65,25 @@ public class Firestore {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Soccorritore tempSocc = new Soccorritore();
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            tempSocc = tempSocc.objIntoNew(document.getData(), tempSocc);
-                            Log.d(TAG, String.format(" --> FETCHED => Socc %s(%s) with location lat: %f and lon: %f\n",
-                                    tempSocc.getUsername(), tempSocc.getStrMatricola(), tempSocc.getLat(), tempSocc.getLon()));
-
-                            marker.position(tempSocc.getPosition())
-                                    .title("Operatore " + tempSocc.getUsername())
-                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.user_yellow_marker));
-                            context.getmMap().addMarker(marker);
-                        }
+                        for (QueryDocumentSnapshot document : task.getResult())
+                            setNewMarker(document, tempSocc);
                     } else {
                         Log.d(TAG, "Errore nel recuperare i documenti: ", task.getException());
                     }
                 })
                 .addOnFailureListener(e -> Log.d(TAG, "Errore nel recuperare i documenti: " + e.getMessage()));
+    }
+
+    /** Dato i dati del soccorritore, posiziona il marcatore relativo alla sua posizione */
+    private void setNewMarker(QueryDocumentSnapshot document, Soccorritore tempSocc) {
+        tempSocc = tempSocc.objIntoNew(document.getData(), tempSocc);
+        Log.d(TAG, String.format(" --> FETCHED => Socc %s(%s) with location lat: %f and lon: %f\n",
+                tempSocc.getUsername(), tempSocc.getStrMatricola(), tempSocc.getLat(), tempSocc.getLon()));
+
+        marker.position(tempSocc.getPosition())
+                .title("Operatore " + tempSocc.getUsername())
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.user_yellow_marker));
+        context.getMap().addMarker(marker);
     }
 
     private HashMap<String, Soccorritore> extract(HashMap<String, Soccorritore> objs, Task<QuerySnapshot> task) {
@@ -106,6 +107,7 @@ public class Firestore {
                 });
     }
 
+    /** Aggiungi al Firestore un soccorritore nuovo (se presente aggiorna i suoi dati) */
     public void storeNewSocc(Soccorritore soccorritore) {
         this.soccorritore = soccorritore;
 

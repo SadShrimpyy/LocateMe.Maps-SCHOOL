@@ -31,6 +31,7 @@ public class ButtonsManager {
                 "protezione_civile-" + LocalDate.now().toString() + ".txt");
     }
 
+    /** Imposto l'ascoltatore, creo un nuovo file e vi scrivo il testo */
     public void addSaveFile(Button btGstMark) {
         btGstMark.setOnClickListener(view -> {
             String output = createNewFile();
@@ -47,6 +48,7 @@ public class ButtonsManager {
         });
     }
 
+    /** Creo un nuovo file nella cartella predefinita (Documents) */
     private String createNewFile() {
         try {
             if (file.createNewFile())
@@ -58,6 +60,7 @@ public class ButtonsManager {
         return null;
     }
 
+    /** Scrivo nel file */
     private String writeIntoFile() {
         if (markerList.isEmpty())
             return "Inserire prima dei marcatori";

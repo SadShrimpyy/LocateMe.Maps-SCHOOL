@@ -8,10 +8,6 @@ public class ExtendedMarker {
     private MarkerOptions marker = new MarkerOptions();
     private String note = null;
 
-    public ExtendedMarker() {
-
-    }
-
     // Default della classe marker
     public void setPosition(LatLng latLng) {
         this.marker.position(latLng);

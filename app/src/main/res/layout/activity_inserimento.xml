@@ -42,7 +42,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:foregroundGravity="center"
-            android:onClick="ritornaPrincipale"
+            android:onClick="returnToMain"
             android:text="Applica" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
