@@ -104,7 +104,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         // Memorizzare il nuovo soccorritore nel Firestore
-        firestore.storeNewSocc(new Soccorritore(482, "SONOPROVA", "codiceSoccorso1234", new LatLng(49.468051, 0.431726)));
         firestore.storeNewSocc(soccorritore);
     }
 

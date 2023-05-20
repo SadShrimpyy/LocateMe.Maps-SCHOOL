@@ -77,13 +77,15 @@ public class Firestore {
     /** Dato i dati del soccorritore, posiziona il marcatore relativo alla sua posizione */
     private void setNewMarker(QueryDocumentSnapshot document, Soccorritore tempSocc) {
         tempSocc = tempSocc.objIntoNew(document.getData(), tempSocc);
-        Log.d(TAG, String.format(" --> FETCHED => Socc %s(%s) with location lat: %f and lon: %f\n",
-                tempSocc.getUsername(), tempSocc.getStrMatricola(), tempSocc.getLat(), tempSocc.getLon()));
+        if (!tempSocc.getUsername().equals(soccorritore.getUsername())) {
+            Log.d(TAG, String.format(" --> FETCHED => Socc %s(%s) with location lat: %f and lon: %f\n",
+                    tempSocc.getUsername(), tempSocc.getStrMatricola(), tempSocc.getLat(), tempSocc.getLon()));
 
-        marker.position(tempSocc.getPosition())
-                .title("Operatore " + tempSocc.getUsername())
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.user_yellow_marker));
-        context.getMap().addMarker(marker);
+            marker.position(tempSocc.getPosition())
+                    .title("Operatore " + tempSocc.getUsername())
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.user_yellow_marker));
+            context.getMap().addMarker(marker);
+        }
     }
 
     private HashMap<String, Soccorritore> extract(HashMap<String, Soccorritore> objs, Task<QuerySnapshot> task) {
