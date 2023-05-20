@@ -1,4 +1,3 @@
-// Import statements
 package it.alessiomontanari;
 
 import androidx.annotation.NonNull;
@@ -28,6 +27,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import it.alessiomontanari.classes.ButtonsManager;
 import it.alessiomontanari.classes.ExtendedMarker;
@@ -36,7 +36,6 @@ import it.alessiomontanari.classes.Listeners;
 import it.alessiomontanari.classes.Soccorritore;
 import it.alessiomontanari.databinding.ActivityMapsBinding;
 
-// Main activity class implementing OnMapReadyCallback
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     // Costanti
@@ -49,7 +48,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Toast toast;
     private Firestore firestore;
     private int counter = 0;
-    public static ArrayList<ExtendedMarker> markerList = new ArrayList<>();
+    public static LinkedList<ExtendedMarker> markerList = new LinkedList<>();
     private GoogleMap map;
     private Listeners clicksListener;
     // Posizione e Marcatori
@@ -143,13 +142,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             String note = data.getStringExtra("note");
             if (note != null) {
                 Toast.makeText(this, note + " ", Toast.LENGTH_SHORT).show();
+
                 ExtendedMarker extendedMarker = new ExtendedMarker();
                 extendedMarker.setPosition(tempLatLng);
                 extendedMarker.setTitle("Marcatore " + (markerList.size() + 1));
                 extendedMarker.setNote(note);
+
                 map.addMarker(extendedMarker.getMarker());
                 markerList.add(extendedMarker);
 
+                firestore.addMarkerToRescue();
             }
         }
     }

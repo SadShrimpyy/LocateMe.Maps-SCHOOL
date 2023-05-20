@@ -9,9 +9,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.*;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 import it.alessiomontanari.MapsActivity;
 import it.alessiomontanari.R;
+
+import static it.alessiomontanari.MapsActivity.markerList;
 
 public class Firestore {
 
@@ -120,5 +123,17 @@ public class Firestore {
         documentRef.set(soccorritore)
                 .addOnSuccessListener(aVoid -> Log.d(TAG, "Inserimento effettuato con successo, il documento ha ID: " + documentRef.getId()))
                 .addOnFailureListener(e -> Log.d(TAG, "Inserimento NON effettuato"));
+    }
+
+    public void addMarkerToRescue() {
+        // TODO: 5/20/2023 Add marker to firebbasio
+        System.out.println("Items into: " + markerList.size());
+        if (markerList.isEmpty()) return;
+
+        final Iterator<ExtendedMarker> iterator = markerList.iterator();
+        while (iterator.hasNext()) {
+            iterator.next(); // BAD - Just remind
+        }
+        System.out.println("Last note: " + iterator.next().getNote());
     }
 }
