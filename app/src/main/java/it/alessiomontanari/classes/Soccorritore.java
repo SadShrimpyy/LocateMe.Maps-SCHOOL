@@ -46,6 +46,14 @@ public class Soccorritore {
         return position;
     }
 
+    public double getLat() {
+        return position.latitude;
+    }
+
+    public double getLon() {
+        return position.longitude;
+    }
+
     public void setPosition(LatLng position) {
         this.position = position;
     }

@@ -1,0 +1,66 @@
+[33mcommit ce45c0848043b711180ed4add9a2969957621fd5[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m)[m
+Author: SadShrimpy <alessionice@gmail.com>
+Date:   Sat May 20 08:38:12 2023 +0200
+
+    Updated README and gradle to 7.4.1
+
+[33mcommit daafa5bbc85caf7a2939003157bbaeda349b2976[m
+Author: SadShrimpy <alessionice@gmail.com>
+Date:   Mon May 15 13:48:14 2023 +0200
+
+    5/15
+
+[33mcommit 31c5060b00555a946ac86109592cea55e52e210d[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: SadShrimpy <alessionice@gmail.com>
+Date:   Sat May 6 10:38:12 2023 +0200
+
+    First implementation of OtherLocations
+
+[33mcommit 61b6e0627c28655ca0b0673918d38c30ba5472da[m
+Author: SadShrimpy <alessionice@gmail.com>
+Date:   Sat May 6 10:37:45 2023 +0200
+
+    Adjusted for implementation of other dependent methods
+
+[33mcommit 67501edfd0358594bbda54c31ec22e007f1fbd89[m
+Merge: c58b21e 85220e4
+Author: SadShrimpy <alessionice@gmail.com>
+Date:   Sat May 6 10:02:33 2023 +0200
+
+    Merge branch 'master' of https://github.com/SadShrimpyy/LocateMe.Maps-SCHOOL
+
+[33mcommit c58b21e470ee6718ab684119d34308c87ec563d5[m
+Author: SadShrimpy <alessionice@gmail.com>
+Date:   Sat May 6 10:00:48 2023 +0200
+
+    Tets
+
+[33mcommit c4ffd5c2fabde580d24ff5fd0b5d16bb53a5b697[m
+Author: SadShrimpy <alessionice@gmail.com>
+Date:   Sat May 6 10:00:26 2023 +0200
+
+    The extract() method creates a new Soccorritore object, iterates over the documents retrieved from the Firestore database, and adds them to the HashMap object. It uses the putIfAbsent() method to add new objects to the map only if they don't already exist. Finally, it logs a message indicating that the Soccorritore object has been updated.
+
+[33mcommit d60373dd4a6dabebbad17032478c641b45a97e02[m
+Author: SadShrimpy <alessionice@gmail.com>
+Date:   Sat May 6 09:59:23 2023 +0200
+
+    This method is used to transform a map of data into a Soccorritore object containing the same information
+
+[33mcommit 85220e4063d7f691476fc11a29bc9bcc2e3af040[m
+Author: SadShrimpy <123626018+SadShrimpyy@users.noreply.github.com>
+Date:   Sat May 6 08:37:15 2023 +0200
+
+    Update README.md
+
+[33mcommit 216d628422d18f2be85ca42beb3a7e738f53185b[m
+Author: SadShrimpy <123626018+SadShrimpyy@users.noreply.github.com>
+Date:   Sat May 6 08:37:01 2023 +0200
+
+    Create README.md
+
+[33mcommit 0c91c4815c8ccffbd2f2f5e42efbf6060722190f[m
+Author: SadShrimpy <alessionice@gmail.com>
+Date:   Sat May 6 08:34:33 2023 +0200
+
+    First public implementation

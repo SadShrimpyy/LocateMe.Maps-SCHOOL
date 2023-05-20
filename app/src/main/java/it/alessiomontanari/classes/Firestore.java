@@ -24,6 +24,7 @@ public class Firestore {
     private DocumentReference documentRef;
     private Soccorritore soccorritore;
     private String TAG = "<DB>";
+    private MarkerOptions marker;
 
 
     public Firestore(MapsActivity context, Toast toast) {
@@ -31,21 +32,13 @@ public class Firestore {
         this.toast = toast;
 
         this.db = FirebaseFirestore.getInstance();
+
+        marker = new MarkerOptions();
     }
 
-    public void store() {
-        if (this.soccorritore == null) return;
-
-        assert this.soccorritore != null;
-
-        documentRef.set(soccorritore)
-                .addOnSuccessListener(aVoid -> {
-                    Log.d(TAG, "Inserimento effettuato con successo, il documento ha ID: " + documentRef.getId());
-                }).addOnFailureListener(e -> {
-                    Log.d(TAG, "inserimento NON effettiato");
-                });
-    }
-
+    /*
+        # Aggiorna la posizione, in memoria, dell'ultimo soccorritore
+     */
     public void updatePosLastSocc(LatLng latLng) {
         soccorritore.setPosition(latLng);
 
@@ -58,11 +51,12 @@ public class Firestore {
 
     }
 
+    /*
+        # Ritorna tutti i soccorritori - M.2
+     */
     public HashMap<String, Soccorritore> updateAll() {
         if (documentRef == null) return null;
         HashMap<String, Soccorritore> others = new HashMap<>();
-
-        System.out.println("Others readed");
 
         CollectionReference collectionRef = db.collection(soccorritore.getCodiceSoccorso());
         collectionRef.get().addOnCompleteListener(task -> {
@@ -76,23 +70,28 @@ public class Firestore {
         return others;
     }
 
+    /*
+        # Aggiorna la posizione dei marcatori degli operatori
+     */
     public void updatePos() {
-        HashMap<String, Soccorritore> others = new HashMap<>();
         if (documentRef == null) return;
 
         db.collection(soccorritore.getCodiceSoccorso())
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Soccorritore s = new Soccorritore();
+                        Soccorritore tempSocc = new Soccorritore();
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                s = s.objIntoNew(document.getData(), s);
-                                others.put(s.getStrMatricola(), s);
-                                System.out.println("Fetched -> " + s.getStrMatricola());
+                                tempSocc = tempSocc.objIntoNew(document.getData(), tempSocc);
+                                System.out.printf(" --> FETCHED => Socc %s(%s) with location lat: %f and lon: %f\n", tempSocc.getUsername(), tempSocc.getStrMatricola(), tempSocc.getLat(), tempSocc.getLon());
+                                marker
+                                        .position(tempSocc.getPosition())
+                                        .title("Operatore " + tempSocc.getUsername())
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.user_yellow_marker));
+                                context.getmMap().addMarker(marker);
                             }
                         }
-                        setAllNew(others);
                     } else {
                         Log.d(TAG, "Errore nel recuperare i documenti: ", task.getException());
                     }
@@ -100,21 +99,9 @@ public class Firestore {
                 .addOnFailureListener(e -> Log.d(TAG, "Errore nel recuperare i documenti: " + e.getMessage()));
     }
 
-    private void setAllNew(HashMap<String, Soccorritore> others) {
-        GoogleMap mMap = context.mMap;
-        MarkerOptions otherSocc = new MarkerOptions();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            others.forEach((stri, socc) -> {
-                System.out.println("ReFetched -> " + stri); // TODO: 5/15/2023 scorre tutti - cerco di display 
-                otherSocc
-                        .position(socc.getPosition())
-                        .title("Operatore " + socc.getUsername())
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.user_yellow_marker));
-                mMap.addMarker(otherSocc); // Aggiungo il marcatore
-            });
-        }
-    }
-
+    /*
+        # Estraggo i soccorritori dalla task
+     */
     private HashMap<String, Soccorritore> extract(HashMap<String, Soccorritore> objs, Task<QuerySnapshot> task) {
         Soccorritore s = new Soccorritore();
         for (QueryDocumentSnapshot document : task.getResult()) {
@@ -125,6 +112,9 @@ public class Firestore {
         return objs;
     }
 
+    /*
+        # Elimina il documento
+     */
     public void delete() {
         if (documentRef == null) return;
 
@@ -135,15 +125,24 @@ public class Firestore {
         });
     }
 
-    public boolean isNew() {
-        return documentRef == null;
-    }
-
+    /*
+        # Aggiungi un nuovo soccorritore nel database di firebase
+     */
     public void storeNewSocc(Soccorritore soccorritore) {
         this.soccorritore = soccorritore;
 
         this.documentRef = db.collection(this.soccorritore.getCodiceSoccorso()).document(this.soccorritore.getStrMatricola());
 
-        this.store();
+
+        if (this.soccorritore == null) return;
+
+        assert this.soccorritore != null;
+
+        documentRef.set(soccorritore)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Inserimento effettuato con successo, il documento ha ID: " + documentRef.getId());
+                }).addOnFailureListener(e -> {
+                    Log.d(TAG, "inserimento NON effettiato");
+                });
     }
 }

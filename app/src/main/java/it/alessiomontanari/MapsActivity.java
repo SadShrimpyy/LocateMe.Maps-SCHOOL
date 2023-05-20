@@ -54,7 +54,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // Markers
     public static ArrayList<ExtendedMarker> markerList = new ArrayList<>();
-    public GoogleMap mMap;
+    private GoogleMap mMap;
     private Listeners clicksListener;
 
     // Posizione
@@ -248,5 +248,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // Aggiungo i listeners
     private void addListeners() {
         clicksListener.clickMarker(mMap);
+    }
+
+    public GoogleMap getmMap() {
+        return this.mMap;
     }
 }
