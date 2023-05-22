@@ -6,40 +6,40 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class Soccorritore {
+public class Rescuer {
 
-    private int matricola;
-    private String codiceSoccorso;
+    private int serialNumber; // Identificatore Univoco
+    private String rescueCode;
     private String username;
     private LatLng position;
 
-    public Soccorritore(int uuid, String username, String code, LatLng latLng) {
-        this.matricola = uuid;
-        this.codiceSoccorso = code;
+    public Rescuer(int serialNumber, String username, String rescudeCode, LatLng latLng) {
+        this.serialNumber = serialNumber;
+        this.rescueCode = rescudeCode;
         this.username = username;
         this.position = latLng;
     }
 
-    public Soccorritore() {
+    public Rescuer() {
     }
 
 
     // UUID
-    public int getMatricola() {
-        return matricola;
+    public int getSerialNumber() {
+        return serialNumber;
     }
 
-    public void setMatricola(int matricola) {
-        this.matricola = matricola;
+    public void setSerialNumber(int serialNumber) {
+        this.serialNumber = serialNumber;
     }
 
     // Codice
-    public String getCodiceSoccorso() {
-        return codiceSoccorso;
+    public String getRescueCode() {
+        return rescueCode;
     }
 
-    public void setCodiceSoccorso(String codiceSoccorso) {
-        this.codiceSoccorso = codiceSoccorso;
+    public void setRescueCode(String rescueCode) {
+        this.rescueCode = rescueCode;
     }
 
     // Posizione
@@ -76,13 +76,13 @@ public class Soccorritore {
     }
 
     public String getStrMatricola() {
-        return String.valueOf(matricola);
+        return String.valueOf(serialNumber);
     }
 
     /** Passata una HashMap di oggetti generici e un soccorritore, ritorno l'oggetto soccorritore con i propri valori */
-    public Soccorritore objIntoNew(Map<String, Object> data, Soccorritore s) {
-        s.setMatricola(((Long) Objects.requireNonNull(data.get("matricola"))).intValue());
-        s.setCodiceSoccorso((String) data.get("codiceSoccorso"));
+    public Rescuer objIntoNew(Map<String, Object> data, Rescuer s) {
+        s.setSerialNumber(((Long) Objects.requireNonNull(data.get("matricola"))).intValue());
+        s.setRescueCode((String) data.get("codiceSoccorso"));
         s.setUsername((String) data.get("username"));
 
         HashMap<String, Double> positionData = (HashMap<String, Double>) data.get("position");
