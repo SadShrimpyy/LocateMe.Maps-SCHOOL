@@ -24,29 +24,39 @@ public class Rescuer {
     }
 
 
-    // UUID
-    public int getSerialNumber() {
+    /** Numero seriale - identificatore univoco del soccorritore */
+    public int getIntSerialNumber() {
         return serialNumber;
+    }
+
+    public String getStrSerialNumber() {
+        return String.valueOf(serialNumber);
     }
 
     public void setSerialNumber(int serialNumber) {
         this.serialNumber = serialNumber;
     }
 
-    // Codice
+    /** Codice di soccorso - identificatore univoco del soccorso */
     public String getRescueCode() {
         return rescueCode;
+    }
+
+    /** Codice di soccorso dei marcatori - identificatore univoco dei marcatori per soccorso */
+    public String getMarkerCode() {
+        return (rescueCode + "-Markers");
     }
 
     public void setRescueCode(String rescueCode) {
         this.rescueCode = rescueCode;
     }
 
-    // Posizione
+    /** Posizione del soccorritore */
     public LatLng getPosition() {
         return position;
     }
 
+    /** Posizione - latitudine del soccorritore */
     public double getLat() {
         if (position != null)
             return position.latitude;
@@ -54,6 +64,7 @@ public class Rescuer {
             return 0.0;
     }
 
+    /** Posizione - longitudine del soccorritore */
     public double getLon() {
         if (position != null)
             return position.longitude;
@@ -61,22 +72,18 @@ public class Rescuer {
             return 0.0;
     }
 
-
+    /** Posizione - oggetto latutidune e longitudine del soccorritore */
     public void setPosition(LatLng position) {
         this.position = position;
     }
 
-    // Nome utente
+    /** Nome utente - nome utente del soccorritore */
     public String getUsername() {
         return username;
     }
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getStrMatricola() {
-        return String.valueOf(serialNumber);
     }
 
     /** Passata una HashMap di oggetti generici e un soccorritore, ritorno l'oggetto soccorritore con i propri valori */
