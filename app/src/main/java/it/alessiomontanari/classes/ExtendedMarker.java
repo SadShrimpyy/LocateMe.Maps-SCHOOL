@@ -16,6 +16,9 @@ public class ExtendedMarker {
     public void setTitle(String title) {
         this.marker.title(title);
     }
+    public String getTitle() {
+        return this.marker.getTitle();
+    }
 
     // Personalizzati
     public MarkerOptions getMarker() {

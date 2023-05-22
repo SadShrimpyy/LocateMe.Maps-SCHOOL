@@ -26,14 +26,13 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 import it.alessiomontanari.classes.ButtonsManager;
 import it.alessiomontanari.classes.ExtendedMarker;
 import it.alessiomontanari.classes.Firestore;
 import it.alessiomontanari.classes.Listeners;
-import it.alessiomontanari.classes.Soccorritore;
+import it.alessiomontanari.classes.Rescuer;
 import it.alessiomontanari.databinding.ActivityMapsBinding;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -41,7 +40,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // Costanti
     public static final int RQ_INSERIMENTO = 1;
     public static String note;
-    public Soccorritore soccorritore;
+    public Rescuer rescuer;
 
     // Referenze e variabili
     public static String currentPosName = "Posizione corrente";
@@ -61,11 +60,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public MapsActivity() {
         // Ottenute da catta - Dalla parte di LOGIN
-        String codiceSoccorso = "codiceSoccorso1234";
+        String codiceSoccorso = "codiceSoccorso124";
         String username = "usr3";
-        int matricola = 0000321;
+        int matricola = 10031;
 
-        soccorritore = new Soccorritore(matricola, username, codiceSoccorso, null);
+        rescuer = new Rescuer(matricola, username, codiceSoccorso, null);
     }
 
     public GoogleMap getMap() {
@@ -103,7 +102,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         // Memorizzare il nuovo soccorritore nel Firestore
-        firestore.storeNewSocc(soccorritore);
+        firestore.storeNewSocc(rescuer);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -151,7 +150,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 map.addMarker(extendedMarker.getMarker());
                 markerList.add(extendedMarker);
 
-                firestore.addMarkerToRescue();
+                firestore.addMarkerToRescue(extendedMarker);
             }
         }
     }
@@ -194,10 +193,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     /** Ascoltatore di posizione */
     @SuppressLint("MissingPermission")
     private void locationListener() {
+        System.out.println("--> Counter " + counter);
         locationListener = location -> {
             counter++;
-            if (counter % 5 == 0)
+            if (counter == 5) {
                 updatePos(location);
+                counter = 0;
+            }
         };
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
     }

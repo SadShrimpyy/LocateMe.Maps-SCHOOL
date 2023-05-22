@@ -44,7 +44,7 @@ public class Rescuer {
 
     /** Codice di soccorso dei marcatori - identificatore univoco dei marcatori per soccorso */
     public String getMarkerCode() {
-        return (rescueCode + "-Markers");
+        return (rescueCode + "-Markesrs");
     }
 
     public void setRescueCode(String rescueCode) {
@@ -88,8 +88,8 @@ public class Rescuer {
 
     /** Passata una HashMap di oggetti generici e un soccorritore, ritorno l'oggetto soccorritore con i propri valori */
     public Rescuer objIntoNew(Map<String, Object> data, Rescuer s) {
-        s.setSerialNumber(((Long) Objects.requireNonNull(data.get("matricola"))).intValue());
-        s.setRescueCode((String) data.get("codiceSoccorso"));
+        s.setSerialNumber(Integer.parseInt(Objects.requireNonNull(data.get("intSerialNumber")).toString()));
+        s.setRescueCode((String) data.get("rescueCode"));
         s.setUsername((String) data.get("username"));
 
         HashMap<String, Double> positionData = (HashMap<String, Double>) data.get("position");
