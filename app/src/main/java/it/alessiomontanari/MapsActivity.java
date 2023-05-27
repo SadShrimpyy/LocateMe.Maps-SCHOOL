@@ -198,6 +198,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             counter++;
             if (counter == 5) {
                 updatePos(location);
+                firestore.drawMarkers();
                 counter = 0;
             }
         };

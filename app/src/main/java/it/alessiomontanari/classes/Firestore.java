@@ -13,8 +13,6 @@ import java.util.HashMap;
 import it.alessiomontanari.MapsActivity;
 import it.alessiomontanari.R;
 
-import static it.alessiomontanari.MapsActivity.markerList;
-
 public class Firestore {
 
     private FirebaseFirestore db;
@@ -70,9 +68,8 @@ public class Firestore {
                         Rescuer tempSocc = new Rescuer();
                         for (QueryDocumentSnapshot document : task.getResult())
                             setNewMarker(document, tempSocc);
-                    } else {
+                    } else
                         Log.d(TAG, "Errore nel recuperare i documenti: ", task.getException());
-                    }
                 })
                 .addOnFailureListener(e -> Log.d(TAG, "Errore nel recuperare i documenti: " + e.getMessage()));
     }
@@ -117,7 +114,6 @@ public class Firestore {
         if (!tempSocc.getUsername().equals(rescuer.getUsername())) {
             Log.d(TAG, String.format(" --> FETCHED => Socc %s(%s) with location lat: %f and lon: %f\n",
                     tempSocc.getUsername(), tempSocc.getStrSerialNumber(), tempSocc.getLat(), tempSocc.getLon()));
-
             marker.position(tempSocc.getPosition())
                     .title("Operatore " + tempSocc.getUsername())
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.user_yellow_marker));
@@ -125,13 +121,29 @@ public class Firestore {
         }
     }
 
+    /** Aggiungi un marcatore al firebase */
     public void addMarkerToRescue(ExtendedMarker extendedMarker) {
-        // TODO: 5/20/2023 Retrive all the markers to the firebbasio
         this.docRefMarkers = db.collection(this.rescuer.getRescueCode() + "<Markers>").document(extendedMarker.getTitle());
         if (this.docRefMarkers == null) return;
 
         docRefMarkers.set(extendedMarker)
                 .addOnSuccessListener(aVoid -> Log.d(TAG, "Inserimento (marcatore) effettuato con successo, il documento ha ID: " + docRefRescuers.getId()))
                 .addOnFailureListener(e -> Log.d(TAG, "Inserimento (marcatore) NON effettuato"));
+    }
+
+    /** Aggiorna i marcatori presi da firebase */
+    public void drawMarkers() {
+        db.collection(this.rescuer.getRescueCode() + "<Markers>")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        ExtendedMarker tempMark = new ExtendedMarker();
+                        for (QueryDocumentSnapshot document : task.getResult())
+                            tempMark.objIntoNew(document.getData(), tempMark);
+                            context.getMap().addMarker(tempMark.getMarker());
+                    } else
+                        Log.d(TAG, "Errore nel recuperare i marcatori: ", task.getException());
+                })
+                .addOnFailureListener(e -> Log.d(TAG, "Errore nel recuperare i marcatori: " + e.getMessage()));
     }
 }
